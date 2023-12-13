@@ -1,0 +1,30 @@
+# flyctl launch added from .gitignore
+# binary outputed by roc
+**/main
+
+# flyctl launch added from basic-webserver/.gitignore
+
+# Ignore generated docs
+basic-webserver/**/generated-docs
+
+basic-webserver/**/app
+basic-webserver/**/*.o
+basic-webserver/**/*.so
+basic-webserver/**/*.so.*
+
+basic-webserver/**/examples/main
+basic-webserver/**/examples/todos
+basic-webserver/**/examples/http
+basic-webserver/**/examples/echo
+basic-webserver/**/examples/sleep
+basic-webserver/**/examples/file
+basic-webserver/**/examples/dir
+basic-webserver/**/examples/env
+basic-webserver/**/examples/command
+
+# flyctl launch added from basic-webserver/platform/.gitignore
+basic-webserver/platform/**/target
+basic-webserver/platform/**/*.o
+basic-webserver/platform/**/*.so
+basic-webserver/platform/**/*.so.*
+fly.toml

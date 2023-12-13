@@ -1,0 +1,15 @@
+{
+    "name": "roc-htmx",
+    "version": "1.0.0",
+    "description": "Example of how to use htmx with Roc",
+    "main": "\"\"",
+    "scripts": {
+        "start": "roc dev app/src/main.roc",
+        "test": "roc test app/src/main.roc",
+        "build:docker": "docker build -t roc-htmx-app .",
+        "run:docker": "docker run -d -p 8000:8000 roc-htmx-app",
+        "deploy": "fly launch -ha"
+    },
+    "author": "",
+    "license": "ISC"
+}
