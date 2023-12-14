@@ -1,3 +1,9 @@
 # binary outputed by roc
 main
+
+# roc packages
 basic-webserver
+roc-pg
+
+.idea
+.env

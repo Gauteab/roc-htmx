@@ -8,7 +8,8 @@
         "test": "roc test app/src/main.roc",
         "build:docker": "docker build -t roc-htmx-app .",
         "run:docker": "docker run -d -p 8000:8000 roc-htmx-app",
-        "deploy": "fly launch -ha"
+        "deploy": "fly launch -ha",
+        "start:db": "fly proxy 5432 -a falling-voice-8263"
     },
     "author": "",
     "license": "ISC"
