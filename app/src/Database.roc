@@ -1,4 +1,4 @@
-interface Database exposes [getPackages] imports [
+interface Database exposes [getPackages, Package] imports [
         pg.Pg.Client,
         pg.Pg.Result,
         pg.Pg.Cmd,
@@ -6,24 +6,31 @@ interface Database exposes [getPackages] imports [
         pf.Task.{ Task },
     ]
 
-getPackages : Task (List { name : Str, author : Str }) _
-getPackages =
+withClient = \callback ->
     password <- Env.var "POSTGRES_PASSWORD" |> Task.await
 
-    client <- Pg.Client.withConnect {
+    Pg.Client.withConnect
+        {
             host: "localhost",
             port: 5432,
             user: "postgres",
-            database: "postgres",
+            database: "roc_packages",
             auth: Password password,
         }
+        callback
 
-    Pg.Cmd.new "select name, author from roc_packages"
-    |> Pg.Cmd.expectN
-        (
-            Pg.Result.succeed {
-                name: <- Pg.Result.str "name" |> Pg.Result.apply,
-                author: <- Pg.Result.str "author" |> Pg.Result.apply,
-            }
-        )
+Package : { name : Str, author : Str }
+
+getPackages : Task (List Package) _
+getPackages =
+    client <- withClient
+
+    decoder =
+        Pg.Result.succeed {
+            name: <- Pg.Result.str "name" |> Pg.Result.apply,
+            author: <- Pg.Result.str "author" |> Pg.Result.apply,
+        }
+
+    Pg.Cmd.new "select name, author from packages"
+    |> Pg.Cmd.expectN decoder
     |> Pg.Client.command client

@@ -19,11 +19,12 @@ app "htmx-app"
         pf.Http.{ Request, Response },
         pf.Url.{ Url },
         pf.Utc,
-        html.Html.{ div, text },
+        html.Html,
         html.Attribute,
         htmx.Hx,
-        Index,
-        Hello,
+        Pages.Index,
+        Pages.Hello,
+        Pages.Packages,
         Database,
     ]
     provides [main] to pf
@@ -35,20 +36,18 @@ htmlResponse = \html ->
 handleRequest : Request -> Task Response _
 handleRequest = \req ->
     when urlSegments req.url is
-        [] -> htmlResponse Index.html
-        ["loaded"] -> htmlResponse Hello.html
-        ["clicked"] -> htmlResponse (text "Clicked!")
+        [] -> htmlResponse Pages.Index.html
+        ["loaded"] -> htmlResponse Pages.Hello.html
+        ["clicked"] -> htmlResponse (Html.text "Clicked!")
         ["packages"] ->
             packages <- Database.getPackages |> Task.await
-            renderedPackages = List.map packages \{ name, author } -> div [] [text "\(name) by \(author)"]
-            htmlResponse (div [] renderedPackages)
+            htmlResponse (Pages.Packages.render packages)
 
         _ -> Task.err RouteNotFound
 
 main : Request -> Task Response []
 main = \req ->
 
-    # Log request date, method and url
     date <- Utc.now |> Task.map Utc.toIso8601Str |> Task.await
     {} <- Stdout.line "\(date) \(Http.methodToStr req.method) \(req.url)" |> Task.await
 

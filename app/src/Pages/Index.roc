@@ -1,4 +1,4 @@
-interface Index exposes [html] imports [html.Html.{
+interface Pages.Index exposes [html] imports [html.Html.{
         element,
         text,
         div,

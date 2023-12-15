@@ -1,4 +1,4 @@
-interface Hello exposes [html] imports [
+interface Pages.Hello exposes [html] imports [
         html.Html.{
             text,
             div,
