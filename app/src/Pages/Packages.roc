@@ -25,26 +25,41 @@ html = div [] [
             Html.text "Searching...",
         ],
     ],
-    Html.input
-        [
-            Attribute.class "form-control",
-            Attribute.type "search",
-            Attribute.name "search",
-            Attribute.placeholder "Begin Typing To Search Packages...",
-            Hx.post "/search",
-            Hx.trigger "input changed delay:500ms, search",
-            Hx.target "#search-results",
-            Hx.swap "outerHTML",
-            Hx.indicator ".htmx-indicator",
-        ]
-        [],
-    Html.table [Attribute.class "table"] [
-        Html.thead [] [
-            Html.tr [] [
-                Html.th [] [Html.text "Name"],
-                Html.th [] [Html.text "Author"],
+    Html.form [] [
+        Html.input
+            [
+                Attribute.class "form-control",
+                Attribute.type "search",
+                Attribute.name "name",
+                Attribute.placeholder "roc-pg",
+                Hx.post "/search",
+                Hx.trigger "input changed delay:500ms, search",
+                Hx.target "#search-results",
+                Hx.swap "outerHTML",
+                Hx.indicator ".htmx-indicator",
+            ]
+            [],
+        Html.input
+            [
+                Attribute.class "form-control",
+                Attribute.type "search",
+                Attribute.name "author",
+                Attribute.placeholder "agu-z",
+                Hx.post "/search",
+                Hx.trigger "input changed delay:500ms, search",
+                Hx.target "#search-results",
+                Hx.swap "outerHTML",
+                Hx.indicator ".htmx-indicator",
+            ]
+            [],
+        Html.table [Attribute.class "table"] [
+            Html.thead [] [
+                Html.tr [] [
+                    Html.th [] [Html.text "Name"],
+                    Html.th [] [Html.text "Author"],
+                ],
             ],
+            Html.tbody [Attribute.id "search-results"] [],
         ],
-        Html.tbody [Attribute.id "search-results"] [],
     ],
 ]

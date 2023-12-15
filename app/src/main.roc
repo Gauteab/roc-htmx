@@ -59,6 +59,15 @@ parseFormDataBody = \req ->
         Body body ->
             body.body |> Str.fromUtf8 |> Result.withDefault "" |> parseFormData
 
+getPackageSearch = \req ->
+    formData = parseFormDataBody req
+    dbg
+        formData
+
+    name <- Dict.get formData "name" |> Result.try
+    author <- Dict.get formData "author" |> Result.try
+    Ok { name, author }
+
 handleRequest : Request -> Task Response _
 handleRequest = \req ->
 
@@ -68,8 +77,7 @@ handleRequest = \req ->
         ["clicked"] -> htmlResponse (Html.text "Clicked!")
         ["packages"] -> htmlResponse Pages.Packages.html
         ["search"] ->
-            formData = parseFormDataBody req
-            when Dict.get formData "search" is
+            when getPackageSearch req is
                 Err _ -> Task.err MissingSearchParam
                 Ok search ->
                     packages <- Database.getPackages search |> Task.await

@@ -21,7 +21,7 @@ withClient = \callback ->
 
 Package : { name : Str, author : Str }
 
-getPackages : Str -> Task (List Package) _
+getPackages : { name : Str, author : Str } -> Task (List Package) _
 getPackages = \search ->
     dbg
         search
@@ -34,7 +34,7 @@ getPackages = \search ->
             author: <- Pg.Result.str "author" |> Pg.Result.apply,
         }
 
-    Pg.Cmd.new "select name, author from packages where name like $1"
-    |> Pg.Cmd.bind [Pg.Cmd.str "%\(search)%"]
+    Pg.Cmd.new "select name, author from packages where name like $1 and author like $2"
+    |> Pg.Cmd.bind [Pg.Cmd.str "%\(search.name)%", Pg.Cmd.str "%\(search.author)%"]
     |> Pg.Cmd.expectN decoder
     |> Pg.Client.command client
