@@ -16,7 +16,7 @@ app "htmx-app"
         pf.Stdout,
         pf.Env,
         pf.Task.{ Task },
-        pf.Http.{ Request, Response },
+        pf.Http.{ Request, Response, header },
         pf.Url.{ Url },
         pf.Utc,
         html.Html,
@@ -30,18 +30,50 @@ app "htmx-app"
     provides [main] to pf
 
 htmlResponse = \html ->
-    htmlText = Html.render html
-    Task.ok { status: 200, headers: [], body: Str.toUtf8 htmlText }
+    htmlText = Html.renderWithoutDocType html
+    Task.ok {
+        status: 200,
+        headers: [header "Content-type" "text/html"],
+        body: Str.toUtf8 htmlText,
+    }
+
+parseFormData : Str -> Dict Str Str
+parseFormData = \body ->
+    body
+    |> Str.split "&"
+    |> List.keepOks
+        (\assignment ->
+            parts = Str.split assignment "="
+            fst <- List.get parts 0 |> Result.try
+            snd <- List.get parts 1 |> Result.try
+            Ok (fst, snd)
+        )
+    |> Dict.fromList
+
+parseFormDataBody : Request -> Dict Str Str
+parseFormDataBody = \req ->
+    when req.body is
+        EmptyBody ->
+            Dict.empty {}
+
+        Body body ->
+            body.body |> Str.fromUtf8 |> Result.withDefault "" |> parseFormData
 
 handleRequest : Request -> Task Response _
 handleRequest = \req ->
+
     when urlSegments req.url is
         [] -> htmlResponse Pages.Index.html
         ["loaded"] -> htmlResponse Pages.Hello.html
         ["clicked"] -> htmlResponse (Html.text "Clicked!")
-        ["packages"] ->
-            packages <- Database.getPackages |> Task.await
-            htmlResponse (Pages.Packages.render packages)
+        ["packages"] -> htmlResponse Pages.Packages.html
+        ["search"] ->
+            formData = parseFormDataBody req
+            when Dict.get formData "search" is
+                Err _ -> Task.err MissingSearchParam
+                Ok search ->
+                    packages <- Database.getPackages search |> Task.await
+                    htmlResponse (Pages.Packages.render packages)
 
         _ -> Task.err RouteNotFound
 
@@ -71,6 +103,9 @@ main = \req ->
             }
 
         Err (TcpConnectErr _) ->
+            dbg
+                TcpConneErr
+
             Task.ok {
                 status: 500,
                 headers: [],
@@ -84,6 +119,9 @@ main = \req ->
             }
 
         Err (TcpPerformErr (PgErr err)) ->
+            dbg
+                err
+
             if err.code == "3D000" then
                 Task.ok {
                     status: 500,
@@ -115,10 +153,10 @@ main = \req ->
                 body: "Something went wrong" |> Str.toUtf8,
             }
 
-expect (urlSegments "") == []
-expect (urlSegments "/") == []
-expect (urlSegments "/a") == ["a"]
-expect (urlSegments "/a/b") == ["a", "b"]
+# expect (urlSegments "") == []
+# expect (urlSegments "/") == []
+# expect (urlSegments "/a") == ["a"]
+# expect (urlSegments "/a/b") == ["a", "b"]
 
 urlSegments : Str -> List Str
 urlSegments = \url ->

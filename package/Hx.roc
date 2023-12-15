@@ -8,6 +8,7 @@ interface Hx
         trigger,
         target,
         swap,
+        indicator,
     ]
     imports [html.Attribute]
 
@@ -20,3 +21,5 @@ trigger = Attribute.attribute "hx-trigger"
 target = Attribute.attribute "hx-target"
 
 swap = Attribute.attribute "hx-swap"
+
+indicator = Attribute.attribute "hx-indicator"

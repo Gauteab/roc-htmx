@@ -38,7 +38,7 @@ html =
                 [
                     div
                         [
-                            Hx.get "/loaded",
+                            Hx.get "/packages",
                             Hx.swap "outerHTML",
                             Hx.trigger "load",
                         ]
